@@ -1,26 +1,204 @@
 @import "tailwindcss";
 
+/* ─── Palette estratta dal logo Euroceram ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --teal:         #5BA4A4;
+  --teal-dark:    #3D7A7A;
+  --teal-light:   #7EC4C4;
+  --teal-muted:   rgba(91,164,164,0.12);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --bg:           #F5F0E8;
+  --bg-2:         #EDE8DF;
+  --surface:      #FFFFFF;
+  --border:       #D8D0C4;
+
+  --text:         #1E1E1E;
+  --text-muted:   #6A6460;
+  --text-light:   #9A9490;
+
+  --accent:       #B8956A;
+  --accent-dark:  #8B6840;
+
+  --dark:         #1C1C1C;
+  --dark-2:       #2A2A2A;
+
+  --card:         #EDE8DF;
+  --muted:        #6A6460;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg:           #0C1616;
+    --bg-2:         #142020;
+    --surface:      #182828;
+    --border:       #2A3C3C;
+    --text:         #EDE8DF;
+    --text-muted:   #8A9898;
+    --text-light:   #5A6868;
+    --teal:         #6BBCBC;
+    --teal-dark:    #4A9898;
+    --teal-light:   #8AD4D4;
+    --teal-muted:   rgba(107,188,188,0.12);
+    --accent:       #C4A882;
+    --accent-dark:  #A08060;
+    --dark:         #EDE8DF;
+    --dark-2:       #C0B8A8;
+    --surface:      #162424;
+    --card:         #162828;
+    --muted:        #8A9898;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-display: var(--font-cormorant);
+  --font-sans:    var(--font-inter);
 }
+
+/* ─── Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 3px; }
+
+/* ─── Keyframes ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes tileFloat {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50%       { transform: translateY(-10px) rotate(var(--r, 0deg)); }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes drawLine {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes preloaderOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.04); pointer-events: none; }
+}
+
+/* ─── Utility classes ─── */
+.font-display { font-family: var(--font-cormorant), Georgia, serif; }
+
+.teal-gradient {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, var(--teal) 0%, var(--teal-light) 30%, var(--teal) 60%, #fff 80%, var(--teal) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 5s linear infinite;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 500;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--teal);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--teal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  transition: background 0.3s, transform 0.2s;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 13px 32px;
+  border: 1px solid var(--teal);
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-outline:hover { background: var(--teal); color: #fff; transform: translateY(-1px); }
+
+.card-hover {
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s;
+}
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+}
+
+/* ─── Tile decorative background ─── */
+.tile-bg {
+  background-image:
+    linear-gradient(rgba(91,164,164,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91,164,164,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ─── Prose (Chi siamo) ─── */
+.prose-euro p {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.prose-euro strong { color: var(--text); font-weight: 600; }
