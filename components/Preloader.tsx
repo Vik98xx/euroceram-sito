@@ -25,10 +25,10 @@ export default function Preloader() {
           {/* Animated tiles grid */}
           <div className="relative w-24 h-24 mb-8">
             {[
-              { x: 0,  y: 0,  delay: 0,    color: '#5BA4A4' },
+              { x: 0,  y: 0,  delay: 0,    color: '#6FA890' },
               { x: 13, y: 0,  delay: 0.1,  color: '#A8A8A8' },
               { x: 0,  y: 13, delay: 0.2,  color: '#1C1C1C' },
-              { x: 13, y: 13, delay: 0.15, color: '#5BA4A4', opacity: 0.5 },
+              { x: 13, y: 13, delay: 0.15, color: '#6FA890', opacity: 0.5 },
             ].map((tile, i) => (
               <motion.div
                 key={i}

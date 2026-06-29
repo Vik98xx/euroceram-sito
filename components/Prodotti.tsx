@@ -1,7 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useInView } from './motion'
+import { useState } from 'react'
+import Link from 'next/link'
+import { motion } from './motion'
+import { InfiniteGridDecor } from './ui/the-infinite-grid'
 
 const CATEGORIES = [
   {
@@ -10,6 +12,8 @@ const CATEGORIES = [
     tags: ['Gres Porcellanato', 'Grande Formato', 'Effetto Marmo', 'Outdoor'],
     accent: 'var(--teal)',
     icon: <TileIcon />,
+    img: '/images/vendor-photos/emil-ceramica/crystal--tdm20extra20120x27820living.jpg',
+    catalogAnchor: 'emil-crystal',
   },
   {
     title: 'Ceramiche Decorative',
@@ -17,6 +21,8 @@ const CATEGORIES = [
     tags: ['Maiolica', 'Mosaico', 'Decori', 'Artistico'],
     accent: 'var(--accent)',
     icon: <WallIcon />,
+    img: '/images/vendor-photos/emil-ceramica/forme-ambienti-jpeg-300dpi-a4--forme-antracite-80x80-majolica-lux-ocra-brick-bianco-assoluto-antracite-amb-ristorante.jpg',
+    catalogAnchor: 'emil-forme',
   },
   {
     title: 'Arredo Bagno',
@@ -24,6 +30,8 @@ const CATEGORIES = [
     tags: ['Mobili Bagno', 'Lavabi', 'Specchi LED', 'Accessori'],
     accent: 'var(--teal)',
     icon: <BathroomIcon />,
+    img: '/images/brand-photos/bagno-1.jpg',
+    catalogAnchor: 'fap-ceramiche',
   },
   {
     title: 'Rubinetterie',
@@ -31,6 +39,8 @@ const CATEGORIES = [
     tags: ['Miscelatori', 'Termostatici', 'Da Incasso', 'Design'],
     accent: 'var(--accent)',
     icon: <TapIcon />,
+    img: '/images/brand-photos/rubinetteria-cover.png',
+    catalogAnchor: null,
   },
   {
     title: 'Sanitari',
@@ -38,6 +48,8 @@ const CATEGORIES = [
     tags: ['WC Sospeso', 'Bidet', 'Monoblocco', 'Top Brand'],
     accent: 'var(--teal)',
     icon: <SanitaryIcon />,
+    img: '/images/brand-photos/sanitari-4.webp',
+    catalogAnchor: null,
   },
   {
     title: 'Box Doccia & Vasche',
@@ -45,115 +57,190 @@ const CATEGORIES = [
     tags: ['Walk-in', 'Filo Pavimento', 'Freestanding', 'Idromassaggio'],
     accent: 'var(--accent)',
     icon: <ShowerIcon />,
+    img: '/images/brand-photos/docce-2.jpg',
+    catalogAnchor: null,
+  },
+  {
+    title: 'Tipo Vietrese',
+    desc: 'La riggiola tipica delle zone amalfitane e sorrentine: ceramica tradizionale che fonde passato e presente in rosoni e decori dai colori del mare.',
+    tags: ['Riggiola', 'Maiolica del Golfo', 'Cotto Mediterraneo', 'Fatto a Mano'],
+    accent: 'var(--accent)',
+    icon: <RiggiolaIcon />,
+    img: '/images/vendor-photos/tipo-vietrese/pdf-antiche-riggiole-napoletane-p1.jpg',
+    catalogAnchor: 'tipo-vietrese',
   },
 ]
 
 export default function Prodotti() {
-  const ref = useRef<HTMLElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
-
   return (
-    <section id="prodotti" ref={ref} className="py-28 lg:py-36" style={{ background: '#0C1616' }}>
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-20">
+    <section id="prodotti" style={{ position: 'relative', overflow: 'hidden', background: '#10130F', paddingTop: 'var(--section-gap-lg)', paddingBottom: 'var(--section-gap-md)' }}>
+      <div className="hidden md:block"><InfiniteGridDecor /></div>
+      <div className="w-full" style={{ position: 'relative', zIndex: 1, paddingLeft: "clamp(16px, 3vw, 60px)", paddingRight: "clamp(16px, 3vw, 60px)" }}>
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
+        <div className="text-center mb-24">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-10" style={{ background: 'var(--teal)' }} />
+            <span className="section-label" style={{ color: 'rgba(255,255,255,0.5)' }}>Il Nostro Catalogo</span>
+            <div className="h-px w-10" style={{ background: 'var(--teal)' }} />
+          </div>
+          <h2
+            className="font-display text-white"
+            style={{ fontSize: 'clamp(2.2rem, 4vw, 3.5rem)', lineHeight: 1.1 }}
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-10" style={{ background: 'var(--teal)' }} />
-              <span className="section-label" style={{ color: 'rgba(255,255,255,0.5)' }}>Il Nostro Catalogo</span>
-            </div>
-            <h2
-              className="font-display text-white"
-              style={{ fontSize: 'clamp(2.2rem, 4vw, 3.5rem)', lineHeight: 1.1 }}
-            >
-              I Nostri <span style={{ color: 'var(--teal)' }}>Prodotti</span>
-            </h2>
-          </motion.div>
-          <motion.p
-            className="text-sm leading-relaxed max-w-sm"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            I Nostri <span style={{ color: 'var(--teal)' }}>Prodotti</span>
+          </h2>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.45)', maxWidth: '34rem', marginLeft: 'auto', marginRight: 'auto', marginTop: '1.25rem' }}
           >
             Tutto quello che serve per trasformare la tua casa: dall&apos;idea al prodotto finito,
             con la consulenza dei nostri esperti.
-          </motion.p>
+          </p>
         </div>
 
-        {/* Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        {/* Griglia 2 colonne su mobile, 3 su desktop — tutte visibili senza scorrimento */}
+        <div
+          className="grid grid-cols-2 lg:grid-cols-3"
+          style={{ gap: 'clamp(0.5rem, 2vw, 1.5rem)' }}
+        >
           {CATEGORIES.map((cat, i) => (
-            <motion.div
-              key={i}
-              className="relative group cursor-pointer p-8"
-              style={{ background: '#0C1616' }}
-              initial={{ opacity: 0, y: 40 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: i * 0.08 }}
-              whileHover={{ background: '#111F1F' }}
-            >
-              {/* Top color bar */}
-              <div
-                className="absolute top-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500"
-                style={{ background: cat.accent }}
-              />
-
-              {/* Icon */}
-              <div
-                className="w-12 h-12 flex items-center justify-center mb-6"
-                style={{ background: 'rgba(91,164,164,0.1)', border: `1px solid ${cat.accent}22` }}
-              >
-                {cat.icon}
-              </div>
-
-              <h3 className="text-white font-medium text-lg mb-3 group-hover:text-[var(--teal)] transition-colors duration-300">
-                {cat.title}
-              </h3>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                {cat.desc}
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                {cat.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-[10px] tracking-wider uppercase px-3 py-1"
-                    style={{ border: `1px solid ${cat.accent}33`, color: `${cat.accent}` }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2 mt-6 text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: 'var(--teal)' }}>
-                <span>Scopri di più</span>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </motion.div>
+            <ProdottoCard key={i} cat={cat} i={i} />
           ))}
         </div>
 
         {/* CTA */}
-        <motion.div
-          className="text-center mt-14"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.7 }}
+        <div
+          className="text-center flex flex-wrap justify-center gap-3"
+          style={{ marginTop: '2.5rem' }}
         >
           <a href="#preventivo" className="btn-primary">
             Richiedi Preventivo Gratuito
           </a>
-        </motion.div>
+          <Link href="/catalogo" prefetch={false} className="btn-outline">
+            Vedi il Catalogo Completo
+          </Link>
+        </div>
       </div>
     </section>
+  )
+}
+
+/* ── Card component — hooks called at top level ── */
+type CatType = { title: string; desc: string; tags: string[]; accent: string; icon: React.ReactNode; img: string; catalogAnchor: string | null }
+
+function ProdottoCard({ cat, i }: { cat: CatType; i: number }) {
+  const [hovered, setHovered] = useState(false)
+  const href = cat.catalogAnchor ? `/catalogo#${cat.catalogAnchor}` : '/catalogo'
+
+  return (
+    <motion.div
+      className="relative overflow-hidden"
+      style={{
+        minHeight: 'clamp(160px, 45vw, 360px)',
+        width: '100%',
+        borderRadius: 'clamp(12px, 3vw, 24px)',
+        background: '#10130F',
+        border: '1px solid rgba(255,255,255,0.10)',
+        boxShadow: 'inset 1px 1px 0 rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.25)',
+      }}
+      whileHover={{ y: -6, borderColor: 'rgba(111,168,144,0.4)' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <Link
+        href={href}
+        prefetch={false}
+        aria-label={`Vedi ${cat.title} nel catalogo`}
+        className="absolute inset-0 flex flex-col"
+        style={{ justifyContent: 'flex-end', padding: 0 }}
+      >
+        {/* Foto categoria — sfondo a piena card, come "I Nostri Punti di Forza" */}
+        <img
+          src={cat.img}
+          alt={cat.title}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            transform: hovered ? 'scale(1.07)' : 'scale(1)',
+            transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
+          }}
+        />
+        {/* Pellicola gradiente dal basso verso l'alto */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to top, rgba(8,10,7,0.96) 0%, rgba(8,10,7,0.78) 32%, rgba(8,10,7,0.3) 62%, rgba(8,10,7,0.05) 100%)' }}
+        />
+
+        {/* Etichetta numerica — nascosta su mobile */}
+        <span
+          className="font-display absolute select-none pointer-events-none hidden md:block"
+          style={{ top: 14, right: 20, fontSize: '3.2rem', lineHeight: 1, fontWeight: 500, color: 'rgba(255,255,255,0.18)', zIndex: 1 }}
+        >
+          {String(i + 1).padStart(2, '0')}
+        </span>
+
+        {/* Contenuto in basso, nell'area del gradiente — come PuntiForza */}
+        <div className="relative z-10 h-full flex flex-col justify-end" style={{ padding: 'clamp(0.75rem, 3vw, 2.5rem)' }}>
+          {/* Icon — più piccola su mobile */}
+          <div
+            className="flex items-center justify-center mb-2"
+            style={{
+              width: 'clamp(32px, 6vw, 48px)',
+              height: 'clamp(32px, 6vw, 48px)',
+              borderRadius: 'clamp(8px, 2vw, 16px)',
+              background: 'rgba(16,19,15,0.7)',
+              border: `1px solid ${cat.accent}55`,
+              backdropFilter: 'blur(8px)',
+              flexShrink: 0,
+            }}
+          >
+            {cat.icon}
+          </div>
+
+          <motion.h3
+            className="font-medium text-xs md:text-lg leading-tight mb-0 md:mb-3"
+            style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}
+            animate={{ x: hovered ? 4 : 0, color: hovered ? 'var(--teal)' : '#ffffff' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+          >
+            {cat.title}
+          </motion.h3>
+
+          <p className="hidden md:block text-sm leading-relaxed mb-2.5 sm:mb-5" style={{ color: 'rgba(255,255,255,0.82)', textShadow: '0 1px 8px rgba(0,0,0,0.7)' }}>
+            {cat.desc}
+          </p>
+
+          <div className="hidden md:flex flex-wrap gap-2">
+            {cat.tags.map((tag, ti) => (
+              <motion.span
+                key={tag}
+                className="text-[10px] tracking-wider uppercase px-3 py-1"
+                style={{ border: `1px solid ${cat.accent}55`, color: cat.accent, background: 'rgba(16,19,15,0.5)' }}
+                animate={{ opacity: hovered ? 1 : 0.7 }}
+                transition={{ duration: 0.2, delay: hovered ? ti * 0.05 : 0 }}
+              >
+                {tag}
+              </motion.span>
+            ))}
+          </div>
+
+          <motion.div
+            className="flex items-center gap-2 mt-2.5 md:mt-6 text-[11px] md:text-xs tracking-widest uppercase"
+            style={{ color: 'var(--teal)' }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span>Vedi nel catalogo</span>
+            <motion.svg
+              width="14" height="14" viewBox="0 0 14 14" fill="none"
+              animate={{ x: hovered ? 4 : 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            >
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </motion.svg>
+          </motion.div>
+        </div>
+      </Link>
+    </motion.div>
   )
 }
 
@@ -174,4 +261,7 @@ function SanitaryIcon() {
 }
 function ShowerIcon() {
   return <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M5 19V7" stroke="var(--accent)" strokeWidth="1.4" strokeLinecap="round"/><path d="M5 7a6 6 0 016-6" stroke="var(--accent)" strokeWidth="1.4" strokeLinecap="round"/><path d="M11 1v3" stroke="var(--accent)" strokeWidth="1.4" strokeLinecap="round"/><circle cx="10" cy="13" r="1" fill="var(--accent)"/><circle cx="14" cy="11" r="1" fill="var(--accent)"/><circle cx="14" cy="15" r="1" fill="var(--accent)"/><circle cx="17" cy="12" r="1" fill="var(--accent)"/></svg>
+}
+function RiggiolaIcon() {
+  return <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="1" y="1" width="20" height="20" rx="1" stroke="var(--accent)" strokeWidth="1.4"/><circle cx="11" cy="11" r="5.5" stroke="var(--accent)" strokeWidth="1.2"/><circle cx="11" cy="11" r="2" stroke="var(--accent)" strokeWidth="1.2"/><path d="M11 1v3.5M11 16.5V21M1 11h3.5M16.5 11H21" stroke="var(--accent)" strokeWidth="1.2" strokeLinecap="round"/></svg>
 }

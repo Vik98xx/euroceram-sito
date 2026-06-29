@@ -57,8 +57,8 @@ export function LocationMap({
           rotateX: springRotateX,
           rotateY: springRotateY,
           transformStyle: "preserve-3d",
-          background: '#0F1C1C',
-          borderColor: 'rgba(91,164,164,0.2)',
+          background: '#121511',
+          borderColor: 'rgba(111,168,144,0.2)',
         }}
         animate={{
           width: isExpanded ? 320 : 220,
@@ -79,32 +79,32 @@ export function LocationMap({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <div className="absolute inset-0" style={{ background: '#0F1C1C' }} />
+              <div className="absolute inset-0" style={{ background: '#121511' }} />
 
               <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
                 {/* Strade principali */}
                 {[35, 65].map((y, i) => (
                   <motion.line key={`h${i}`} x1="0%" y1={`${y}%`} x2="100%" y2={`${y}%`}
-                    stroke="rgba(91,164,164,0.3)" strokeWidth="4"
+                    stroke="rgba(111,168,144,0.3)" strokeWidth="4"
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                     transition={{ duration: 0.8, delay: 0.2 + i * 0.1 }} />
                 ))}
                 {[30, 70].map((x, i) => (
                   <motion.line key={`v${i}`} x1={`${x}%`} y1="0%" x2={`${x}%`} y2="100%"
-                    stroke="rgba(91,164,164,0.2)" strokeWidth="3"
+                    stroke="rgba(111,168,144,0.2)" strokeWidth="3"
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                     transition={{ duration: 0.6, delay: 0.4 + i * 0.1 }} />
                 ))}
                 {/* Strade secondarie */}
                 {[20, 50, 80].map((y, i) => (
                   <motion.line key={`hs${i}`} x1="0%" y1={`${y}%`} x2="100%" y2={`${y}%`}
-                    stroke="rgba(91,164,164,0.08)" strokeWidth="1.5"
+                    stroke="rgba(111,168,144,0.08)" strokeWidth="1.5"
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                     transition={{ duration: 0.5, delay: 0.6 + i * 0.1 }} />
                 ))}
                 {[15, 45, 55, 85].map((x, i) => (
                   <motion.line key={`vs${i}`} x1={`${x}%`} y1="0%" x2={`${x}%`} y2="100%"
-                    stroke="rgba(91,164,164,0.08)" strokeWidth="1.5"
+                    stroke="rgba(111,168,144,0.08)" strokeWidth="1.5"
                     initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                     transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }} />
                 ))}
@@ -121,7 +121,7 @@ export function LocationMap({
               ].map((b, i) => (
                 <motion.div key={i} className="absolute rounded-sm"
                   style={{ top: b.top, left: (b as any).left, right: (b as any).right, width: b.w, height: b.h,
-                    background: 'rgba(91,164,164,0.15)', border: '1px solid rgba(91,164,164,0.12)' }}
+                    background: 'rgba(111,168,144,0.15)', border: '1px solid rgba(111,168,144,0.12)' }}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: b.delay }}
@@ -136,13 +136,13 @@ export function LocationMap({
                 transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.3 }}
               >
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-                  style={{ filter: "drop-shadow(0 0 10px rgba(91,164,164,0.6))" }}>
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#5BA4A4" />
-                  <circle cx="12" cy="9" r="2.5" fill="#0C1616" />
+                  style={{ filter: "drop-shadow(0 0 10px rgba(111,168,144,0.6))" }}>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#6FA890" />
+                  <circle cx="12" cy="9" r="2.5" fill="#10130F" />
                 </svg>
               </motion.div>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0C1616] via-transparent to-transparent opacity-60" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#10130F] via-transparent to-transparent opacity-60" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -164,8 +164,8 @@ export function LocationMap({
           <div className="flex items-start justify-between">
             <motion.div animate={{ opacity: isExpanded ? 0 : 1 }} transition={{ duration: 0.3 }}>
               <motion.svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                stroke="#5BA4A4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                animate={{ filter: isHovered ? "drop-shadow(0 0 8px rgba(91,164,164,0.7))" : "drop-shadow(0 0 4px rgba(91,164,164,0.3))" }}
+                stroke="#6FA890" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                animate={{ filter: isHovered ? "drop-shadow(0 0 8px rgba(111,168,144,0.7))" : "drop-shadow(0 0 4px rgba(111,168,144,0.3))" }}
                 transition={{ duration: 0.3 }}>
                 <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
                 <line x1="9" x2="9" y1="3" y2="18" />
@@ -175,11 +175,11 @@ export function LocationMap({
 
             <motion.div
               className="flex items-center gap-1.5 px-2 py-1 rounded-full"
-              style={{ background: 'rgba(91,164,164,0.08)' }}
+              style={{ background: 'rgba(111,168,144,0.08)' }}
               animate={{ scale: isHovered ? 1.05 : 1 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#5BA4A4' }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#6FA890' }} />
               <span className="text-[10px] font-medium tracking-wide uppercase" style={{ color: 'var(--teal)' }}>Aperto</span>
             </motion.div>
           </div>
@@ -210,7 +210,7 @@ export function LocationMap({
 
             <motion.div
               className="h-px"
-              style={{ background: 'linear-gradient(to right, rgba(91,164,164,0.5), rgba(91,164,164,0.2), transparent)' }}
+              style={{ background: 'linear-gradient(to right, rgba(111,168,144,0.5), rgba(111,168,144,0.2), transparent)' }}
               initial={{ scaleX: 0.3, originX: 0 }}
               animate={{ scaleX: isHovered || isExpanded ? 1 : 0.3 }}
               transition={{ duration: 0.4 }}

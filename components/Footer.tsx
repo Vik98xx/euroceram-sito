@@ -5,13 +5,13 @@ import LogoSVG from './LogoSVG'
 import { SocialIcons } from './ui/social-icons'
 
 const NAV = [
-  { label: 'Chi Siamo', href: '#chi-siamo' },
-  { label: 'Prodotti', href: '#prodotti' },
-  { label: 'Brand', href: '#brand' },
+  { label: 'Chi Siamo',   href: '#chi-siamo' },
+  { label: 'Prodotti',    href: '#prodotti' },
+  { label: 'Brand',       href: '#brand' },
   { label: 'Ispirazione', href: '#ispirazione' },
-  { label: 'Offerte', href: '#offerte' },
-  { label: 'Preventivo', href: '#preventivo' },
-  { label: 'Contatti', href: '#contatti' },
+  { label: 'Offerte',     href: '#offerte' },
+  { label: 'Preventivo',  href: '#preventivo' },
+  { label: 'Contatti',    href: '#contatti' },
 ]
 
 const PRODUCTS = [
@@ -23,92 +23,131 @@ const PRODUCTS = [
   'Box Doccia & Vasche',
 ]
 
+const CONTACTS = [
+  { label: 'Via G. Carducci 3, 80022 Arzano (NA)', href: '#', type: 'address' },
+  { label: '081 731 3025', href: 'tel:0817313025', type: 'tel' },
+  { label: '+39 353 392 8484', href: 'tel:+393533928484', type: 'tel' },
+  { label: 'euroceram2002@hotmail.it', href: 'mailto:euroceram2002@hotmail.it', type: 'email' },
+]
+
+function ColHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h4
+      className="font-display mb-5"
+      style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem', fontWeight: 400, letterSpacing: '0.04em' }}
+    >
+      {children}
+    </h4>
+  )
+}
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <motion.a
+      href={href}
+      className="block text-xs leading-relaxed transition-colors duration-200"
+      style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-manrope)' }}
+      whileHover={{ x: 3, color: 'var(--teal)' }}
+    >
+      {children}
+    </motion.a>
+  )
+}
+
 export default function Footer() {
   return (
-    <footer style={{ background: '#060E0E', borderTop: '1px solid rgba(91,164,164,0.12)' }}>
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-20 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer style={{ background: '#080A07', borderTop: '1px solid rgba(111,168,144,0.10)' }}>
+      <div
+        className="w-full py-16"
+        style={{ paddingLeft: 'clamp(16px, 3vw, 60px)', paddingRight: 'clamp(16px, 3vw, 60px)' }}
+      >
+        {/* 5-col grid: brand | nav | prodotti | contatti */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1.4fr] gap-10 lg:gap-8">
 
           {/* Brand */}
-          <div className="lg:col-span-1">
-            <LogoSVG height={36} className="brightness-0 invert mb-4 opacity-90" />
-            <div className="h-px w-10 mb-4" style={{ background: 'var(--teal)' }} />
-            <SocialIcons />
+          <div className="col-span-2 md:col-span-1">
+            <LogoSVG height={120} className="mb-5 opacity-90" />
+            <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.3)', maxWidth: 220 }}>
+              Showroom di ceramiche e arredo bagno ad Arzano (NA). Oltre 70 anni di esperienza, 200+ brand selezionati.
+            </p>
           </div>
 
-          {/* Navigation */}
+          {/* Navigazione */}
           <div>
-            <h4 className="text-white text-[10px] tracking-[0.3em] uppercase font-bold mb-6">Navigazione</h4>
-            <ul className="space-y-3">
+            <ColHeading>Navigazione</ColHeading>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
               {NAV.map((link) => (
-                <li key={link.label}>
-                  <motion.a
-                    href={link.href}
-                    className="text-sm transition-colors duration-200"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}
-                    whileHover={{ x: 4, color: 'var(--teal)' }}
-                  >
-                    {link.label}
-                  </motion.a>
-                </li>
+                <FooterLink key={link.label} href={link.href}>{link.label}</FooterLink>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Products */}
+          {/* Prodotti */}
           <div>
-            <h4 className="text-white text-[10px] tracking-[0.3em] uppercase font-bold mb-6">Prodotti</h4>
-            <ul className="space-y-3">
+            <ColHeading>Prodotti</ColHeading>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
               {PRODUCTS.map((p) => (
-                <li key={p}>
-                  <motion.a
-                    href="#prodotti"
-                    className="text-sm transition-colors duration-200"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}
-                    whileHover={{ x: 4, color: 'var(--teal)' }}
-                  >
-                    {p}
-                  </motion.a>
-                </li>
+                <FooterLink key={p} href="#prodotti">{p}</FooterLink>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h4 className="text-white text-[10px] tracking-[0.3em] uppercase font-bold mb-6">Contatti</h4>
-            <ul className="space-y-4">
+          {/* Orari */}
+          <div className="hidden lg:block">
+            <ColHeading>Orari</ColHeading>
+            <div className="space-y-3">
               {[
-                { label: 'Via G. Carducci 3\n80022 Arzano (NA)', href: '#', icon: '📍' },
-                { label: '081 731 3025', href: 'tel:0817313025', icon: '📞' },
-                { label: '+39 353 392 8484', href: 'tel:+393533928484', icon: '📱' },
-                { label: 'euroceram2002@hotmail.it', href: 'mailto:euroceram2002@hotmail.it', icon: '✉️' },
-              ].map((c, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-sm mt-0.5 opacity-60">{c.icon}</span>
+                { giorni: 'Lun — Ven', ore: '8:30 – 13:00 / 15:00 – 18:00' },
+                { giorni: 'Sabato', ore: '8:30 – 13:00' },
+                { giorni: 'Domenica', ore: 'Chiuso' },
+              ].map((r) => (
+                <div key={r.giorni}>
+                  <div className="text-[10px] tracking-[0.2em] uppercase mb-0.5" style={{ color: 'var(--teal)' }}>{r.giorni}</div>
+                  <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{r.ore}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Contatti */}
+          <div>
+            <ColHeading>Contatti</ColHeading>
+            <div className="space-y-3">
+              {CONTACTS.map((c, i) => (
+                <div key={i}>
+                  <div
+                    className="text-[9px] tracking-[0.25em] uppercase mb-0.5"
+                    style={{ color: 'rgba(111,168,144,0.6)' }}
+                  >
+                    {c.type === 'address' ? 'Indirizzo' : c.type === 'tel' ? (i === 1 ? 'Telefono' : 'Mobile') : 'Email'}
+                  </div>
                   <motion.a
                     href={c.href}
-                    className="text-sm leading-snug whitespace-pre-line transition-colors duration-200"
+                    className="text-xs leading-snug transition-colors duration-200"
                     style={{ color: 'rgba(255,255,255,0.4)' }}
                     whileHover={{ color: 'var(--teal)' }}
                   >
                     {c.label}
                   </motion.a>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
+
         </div>
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t px-6 lg:px-20 py-5" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-        <div className="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+      <div className="border-t py-4" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+        <div
+          className="w-full flex flex-col md:flex-row items-center justify-between gap-2"
+          style={{ paddingLeft: 'clamp(16px, 3vw, 60px)', paddingRight: 'clamp(16px, 3vw, 60px)' }}
+        >
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'var(--font-manrope)' }}>
             © {new Date().getFullYear()} Euroceram 2002 S.R.L. · P.IVA IT07340530634 · Tutti i diritti riservati
           </p>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            Artigianato digitale · Arzano, Napoli
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'var(--font-manrope)' }}>
+            Arzano, Napoli
           </p>
         </div>
       </div>

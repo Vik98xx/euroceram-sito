@@ -1,70 +1,63 @@
 @import "tailwindcss";
 
 /* ─── Palette estratta dal logo Euroceram ─── */
+/* Tema scuro FORZATO sempre: stessi identici colori su desktop e mobile,
+   indipendentemente dall'impostazione chiaro/scuro del dispositivo. */
 :root {
-  --teal:         #5BA4A4;
-  --teal-dark:    #3D7A7A;
-  --teal-light:   #7EC4C4;
-  --teal-muted:   rgba(91,164,164,0.12);
+  color-scheme: dark;
 
-  --bg:           #F5F0E8;
-  --bg-2:         #EDE8DF;
-  --surface:      #FFFFFF;
-  --border:       #D8D0C4;
+  --teal:         #7FB39E;
+  --teal-dark:    #5E957F;
+  --teal-light:   #B2D4C5;
+  --teal-muted:   rgba(127,179,158,0.12);
 
-  --text:         #1E1E1E;
-  --text-muted:   #6A6460;
-  --text-light:   #9A9490;
+  --bg:           #10130F;
+  --bg-2:         #171A15;
+  --surface:      #1A1E17;
+  --border:       #2A3C3C;
 
-  --accent:       #B8956A;
-  --accent-dark:  #8B6840;
+  --text:         #EDE8DF;
+  --text-muted:   #8A9898;
+  --text-light:   #5A6868;
 
-  --dark:         #1C1C1C;
-  --dark-2:       #2A2A2A;
+  --accent:       #C4A882;
+  --accent-dark:  #A08060;
 
-  --card:         #EDE8DF;
-  --muted:        #6A6460;
-}
+  --dark:         #EDE8DF;
+  --dark-2:       #C0B8A8;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:           #0C1616;
-    --bg-2:         #142020;
-    --surface:      #182828;
-    --border:       #2A3C3C;
-    --text:         #EDE8DF;
-    --text-muted:   #8A9898;
-    --text-light:   #5A6868;
-    --teal:         #6BBCBC;
-    --teal-dark:    #4A9898;
-    --teal-light:   #8AD4D4;
-    --teal-muted:   rgba(107,188,188,0.12);
-    --accent:       #C4A882;
-    --accent-dark:  #A08060;
-    --dark:         #EDE8DF;
-    --dark-2:       #C0B8A8;
-    --surface:      #162424;
-    --card:         #162828;
-    --muted:        #8A9898;
-  }
+  --card:         #1C211A;
+  --muted:        #8A9898;
 }
 
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
   --font-display: var(--font-cormorant);
-  --font-sans:    var(--font-inter);
+  --font-sans:    var(--font-manrope);
+}
+
+/* ─── Scala di spaziatura sezioni — un solo sistema, non valori a caso per sezione ─── */
+:root {
+  --section-gap-sm: 3rem;    /* tra blocchi correlati nella stessa sezione */
+  --section-gap-md: 5rem;    /* padding standard di una sezione */
+  --section-gap-lg: 7rem;    /* sezioni "ariose" (hero-like, catalogo) */
+  --header-gap: 1.75rem;     /* tra eyebrow/label e titolo principale */
 }
 
 /* ─── Base ─── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* Dentro @layer base: senza questo, il reset non "layerizzato" vincerebbe sempre
+   sulle utility Tailwind di padding e margin, indipendentemente dalla specificita. */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+}
 
 html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -102,10 +95,26 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+@keyframes aurora {
+  from { background-position: 0% 50%; }
+  to   { background-position: 200% 50%; }
+}
 @keyframes preloaderOut {
   from { opacity: 1; transform: scale(1); }
   to   { opacity: 0; transform: scale(1.04); pointer-events: none; }
 }
+/* Menu mobile a tendina — apertura fluida e morbida */
+@keyframes menuDrop {
+  from { opacity: 0; max-height: 0; transform: translateY(-8px); }
+  to   { opacity: 1; max-height: 80vh; transform: translateY(0); }
+}
+.menu-drop { animation: menuDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1); overflow: hidden; }
+/* Voci del menu: leggera comparsa scaglionata */
+@keyframes menuItem {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.menu-drop a { animation: menuItem 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* ─── Utility classes ─── */
 .font-display { font-family: var(--font-cormorant), Georgia, serif; }
@@ -131,7 +140,7 @@ body {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   color: var(--teal);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-manrope), sans-serif;
   font-weight: 500;
 }
 .section-label::before {
@@ -146,37 +155,57 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--teal);
+  position: relative;
+  background: rgba(111,168,144,0.22);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
   color: #fff;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   padding: 14px 32px;
-  transition: background 0.3s, transform 0.2s;
-  border: none;
+  border: 1px solid rgba(111,168,144,0.5);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.22), 0 4px 24px rgba(111,168,144,0.18);
+  transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
   cursor: pointer;
   text-decoration: none;
+  border-radius: 2px;
 }
-.btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+.btn-primary:hover {
+  background: rgba(111,168,144,0.38);
+  transform: translateY(-1px);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.28), 0 8px 32px rgba(111,168,144,0.28);
+}
 
 .btn-outline {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: transparent;
+  position: relative;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
   color: var(--teal);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   padding: 13px 32px;
-  border: 1px solid var(--teal);
-  transition: background 0.3s, color 0.3s, transform 0.2s;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(0,0,0,0.15);
+  transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
   cursor: pointer;
   text-decoration: none;
+  border-radius: 2px;
 }
-.btn-outline:hover { background: var(--teal); color: #fff; transform: translateY(-1px); }
+.btn-outline:hover {
+  background: rgba(111,168,144,0.14);
+  border-color: rgba(111,168,144,0.45);
+  color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.22), 0 6px 24px rgba(111,168,144,0.18);
+}
 
 .card-hover {
   transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s;
@@ -189,9 +218,25 @@ body {
 /* ─── Tile decorative background ─── */
 .tile-bg {
   background-image:
-    linear-gradient(rgba(91,164,164,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(91,164,164,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(111,168,144,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(111,168,144,0.04) 1px, transparent 1px);
   background-size: 48px 48px;
+}
+
+/* ─── Autofill override form preventivo ─── */
+.preventivo-input:-webkit-autofill,
+.preventivo-input:-webkit-autofill:hover,
+.preventivo-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s !important;
+}
+
+/* ─── Container sezioni ─── */
+.xl-container {
+  width: 100%;
+  padding-left: clamp(20px, 4vw, 80px);
+  padding-right: clamp(20px, 4vw, 80px);
 }
 
 /* ─── Prose (Chi siamo) ─── */
@@ -202,3 +247,52 @@ body {
   margin-bottom: 1.25rem;
 }
 .prose-euro strong { color: var(--text); font-weight: 600; }
+
+/* ─── MapLibre GL overrides ─── */
+.maplibregl-map { font-family: var(--font-manrope), sans-serif; }
+.maplibregl-ctrl-attrib { background: rgba(8,10,7,0.7) !important; color: rgba(255,255,255,0.4) !important; font-size: 9px !important; }
+.maplibregl-ctrl-attrib a { color: rgba(111,168,144,0.7) !important; }
+.maplibregl-popup-content { background: none !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+.maplibregl-popup-tip { display: none !important; }
+.maplibregl-marker { cursor: pointer; }
+
+/* ─── Accessibilità: rispetta chi preferisce meno animazioni ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Accessibilità: stato di focus visibile per navigazione da tastiera ─── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ─── Accessibilità: link "salta al contenuto", visibile solo da tastiera ─── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: #10130F;
+  color: #fff;
+  padding: 12px 20px;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  border: 1px solid var(--teal);
+}
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+}

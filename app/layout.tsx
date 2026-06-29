@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Inter } from 'next/font/google'
+import { Cormorant_Garamond, Manrope } from 'next/font/google'
 import './globals.css'
+import { CustomCursor } from '../components/ui/custom-cursor'
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -10,9 +11,10 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 })
 
-const inter = Inter({
-  variable: '--font-inter',
+const manrope = Manrope({
+  variable: '--font-manrope',
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
   display: 'swap',
 })
 
@@ -33,8 +35,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="min-h-screen flex flex-col antialiased">{children}</body>
+    <html lang="it" className={`${cormorant.variable} ${manrope.variable}`}>
+      <body className="min-h-screen flex flex-col antialiased">
+        <a href="#main" className="skip-link">Vai al contenuto principale</a>
+        {/* Console di debug su schermo (eruda) — TEMPORANEA. Script grezzo: parte
+            indipendentemente da React, così si vede anche se l'app JS non si avvia.
+            Attiva solo con ?debug nell'URL. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(location.search.indexOf('debug')>-1){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/eruda';s.onload=function(){try{window.eruda&&window.eruda.init();}catch(e){alert('eruda init error: '+e);}};s.onerror=function(){alert('Impossibile caricare eruda: nessuna connessione internet sul telefono?');};document.body.appendChild(s);}}catch(e){alert('debug error: '+e);}})();",
+          }}
+        />
+        <CustomCursor />
+        {children}
+      </body>
     </html>
   )
 }

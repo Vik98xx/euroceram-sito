@@ -12,6 +12,7 @@ const OFFERTE = [
     price: '€ 34',
     unit: '/m²',
     color: 'var(--teal)',
+    img: '/images/img-living-lusso.jpg',
   },
   {
     badge: 'OUTLET',
@@ -21,6 +22,7 @@ const OFFERTE = [
     price: '€ 890',
     unit: '',
     color: 'var(--accent)',
+    img: '/images/img-bagno-completo.jpg',
   },
   {
     badge: 'PROMOZIONE',
@@ -30,6 +32,7 @@ const OFFERTE = [
     price: '€ 480',
     unit: '',
     color: 'var(--teal)',
+    img: '/images/img-bagno-industrial.jpg',
   },
 ]
 
@@ -38,14 +41,15 @@ export default function OfferteOutlet() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section id="offerte" ref={ref} className="py-24 lg:py-32" style={{ background: 'var(--bg)' }}>
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-20">
+    <section id="offerte" ref={ref} className="py-36 lg:py-52" style={{ background: 'var(--bg)' }}>
+      <div className="w-full" style={{ paddingLeft: "clamp(16px, 3vw, 60px)", paddingRight: "clamp(16px, 3vw, 60px)" }}>
 
         <motion.div
-          className="mb-14"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
+          className="mb-20"
+          initial={{ opacity: 0, rotateX: -12, y: 16 }}
+          animate={inView ? { opacity: 1, rotateX: 0, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformPerspective: 800 }}
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-10" style={{ background: 'var(--accent)' }} />
@@ -66,8 +70,21 @@ export default function OfferteOutlet() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.1 }}
             >
-              {/* Top accent */}
-              <div className="h-[3px]" style={{ background: item.color }} />
+              {/* Immagine superiore */}
+              {item.img && (
+                <div className="relative overflow-hidden" style={{ height: 180 }}>
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    style={{ filter: 'brightness(0.88) contrast(1.05) saturate(1.05)' }}
+                  />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%)' }} />
+                  <div className="absolute bottom-0 left-0 right-0 h-[3px]" style={{ background: item.color }} />
+                </div>
+              )}
+              {/* Top accent (fallback se no img) */}
+              {!item.img && <div className="h-[3px]" style={{ background: item.color }} />}
 
               <div className="p-7 flex-1 flex flex-col">
                 <span

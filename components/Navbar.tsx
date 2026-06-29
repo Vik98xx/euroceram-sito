@@ -1,22 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from './motion'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { motion } from './motion'
 import LogoSVG from './LogoSVG'
 
 const NAV = [
-  { label: 'Chi Siamo',   href: '#chi-siamo' },
-  { label: 'Prodotti',    href: '#prodotti' },
-  { label: 'Brand',       href: '#brand' },
-  { label: 'Ispirazione', href: '#ispirazione' },
-  { label: 'Offerte',     href: '#offerte' },
-  { label: 'Preventivo',  href: '#preventivo' },
-  { label: 'Contatti',    href: '#contatti' },
+  { label: 'Chi Siamo',   href: '/#chi-siamo' },
+  { label: 'Prodotti',    href: '/#prodotti' },
+  { label: 'Catalogo',    href: '/catalogo' },
+  { label: 'Brand',       href: '/#brand' },
+  { label: 'Ispirazione', href: '/#ispirazione' },
+  { label: 'Preventivo',  href: '/#preventivo' },
+  { label: 'Contatti',    href: '/#contatti' },
 ]
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60)
@@ -24,39 +27,53 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
+  // Per gli anchor "/#id" sulla home: scrolla sempre manualmente, anche se l'hash
+  // nell'URL non cambia (altrimenti il secondo click sullo stesso link non fa nulla).
+  const handleAnchorClick = (href: string) => (e: React.MouseEvent) => {
+    if (!href.startsWith('/#')) return
+    if (pathname !== '/') return
+    e.preventDefault()
+    const id = href.slice(2)
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    window.history.replaceState(null, '', href)
+  }
+
   return (
-    <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+    <nav
+      className="fixed top-0 left-0 right-0 transition-all duration-500"
       style={{
-        background: scrolled ? 'rgba(12,22,22,0.96)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(16px)' : 'none',
-        boxShadow: scrolled ? '0 2px 40px rgba(0,0,0,0.3)' : 'none',
+        zIndex: 130,
+        // Bar di sezione SEMPRE presente: logo e hamburger poggiano su una superficie
+        // visibile in ogni parte del sito, non più simboli sospesi sul contenuto.
+        background: scrolled ? 'rgba(16,19,15,0.97)' : 'rgba(16,19,15,0.82)',
+        backdropFilter: 'blur(16px) saturate(1.3)',
+        WebkitBackdropFilter: 'blur(16px) saturate(1.3)',
+        borderBottom: '1px solid rgba(111,168,144,0.18)',
+        boxShadow: scrolled ? '0 2px 40px rgba(0,0,0,0.35)' : '0 1px 20px rgba(0,0,0,0.22)',
       }}
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-10 flex items-center justify-between h-[70px]">
+      <div className="w-full flex items-center justify-between h-[70px]" style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 'clamp(16px, 3vw, 60px)', paddingRight: 'clamp(16px, 3vw, 60px)' }}>
         {/* Logo */}
-        <motion.a href="#" whileHover={{ scale: 1.02 }}>
-          <LogoSVG height={38} className="brightness-0 invert" />
-        </motion.a>
+        <Link href="/" className="transition-transform duration-200 hover:scale-[1.02] inline-block">
+          <LogoSVG height={56} />
+        </Link>
 
         {/* Desktop links */}
         <div className="hidden lg:flex items-center gap-7">
           {NAV.map((link) => (
-            <motion.a
+            <Link
               key={link.label}
               href={link.href}
-              className="relative text-white/80 hover:text-white text-[11px] tracking-[0.18em] uppercase font-medium group transition-colors"
-              whileHover={{ y: -1 }}
+              prefetch={link.href === '/catalogo' ? false : undefined}
+              onClick={handleAnchorClick(link.href)}
+              className="relative text-white/80 hover:text-white text-[11px] tracking-[0.18em] uppercase font-medium group transition-colors hover:-translate-y-px"
             >
               {link.label}
               <span
                 className="absolute -bottom-1 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
                 style={{ background: 'var(--teal)' }}
               />
-            </motion.a>
+            </Link>
           ))}
         </div>
 
@@ -64,68 +81,84 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <motion.a
             href="tel:0817313025"
-            className="hidden md:flex items-center gap-2 text-white text-[11px] tracking-[0.12em] uppercase font-semibold px-5 py-2.5 border border-white/20 hover:border-[var(--teal)] hover:text-[var(--teal)] transition-colors duration-300"
-            whileHover={{ scale: 1.02 }}
+            className="hidden md:flex items-center justify-center gap-2 tracking-[0.12em] uppercase font-semibold relative overflow-hidden"
+            style={{ color: 'var(--teal)', borderRadius: '999px', fontSize: '11px', padding: '12px 22px' }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
           >
-            <PhoneIcon />
-            081 731 3025
+            {/* glass layers */}
+            <span className="absolute inset-0 pointer-events-none" style={{
+              borderRadius: '999px',
+              backdropFilter: 'blur(14px) saturate(1.5)',
+              WebkitBackdropFilter: 'blur(14px) saturate(1.5)',
+              background: 'rgba(255,255,255,0.06)',
+            }} />
+            <span className="absolute inset-0 pointer-events-none" style={{
+              borderRadius: '999px',
+              border: '1px solid rgba(255,255,255,0.18)',
+              boxShadow: [
+                'inset 1px 1px 0 rgba(255,255,255,0.20)',
+                'inset -1px -1px 0 rgba(255,255,255,0.05)',
+                'inset 0 2px 6px rgba(255,255,255,0.08)',
+                '0 4px 16px rgba(0,0,0,0.18)',
+              ].join(','),
+            }} />
+            <span className="relative z-10 flex items-center gap-2">
+              <PhoneIcon />
+              081 731 3025
+            </span>
           </motion.a>
 
           <button
-            className="lg:hidden flex flex-col gap-[5px] p-2"
-            onClick={() => setOpen(!open)}
+            type="button"
+            className="lg:hidden flex flex-col items-center justify-center gap-[5px] p-3 -mr-2"
+            onClick={() => setOpen((o) => !o)}
             aria-label="Menu"
+            aria-expanded={open}
+            style={{ background: 'transparent', position: 'relative', zIndex: 2, WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
           >
             {[0, 1, 2].map((i) => (
-              <motion.span
+              <span
                 key={i}
-                className="block w-6 h-[2px]"
-                style={{ background: 'var(--teal)' }}
-                animate={
-                  i === 0 ? { rotate: open ? 45 : 0, y: open ? 7 : 0 }
-                  : i === 1 ? { opacity: open ? 0 : 1 }
-                  : { rotate: open ? -45 : 0, y: open ? -7 : 0 }
-                }
-                transition={{ duration: 0.25 }}
+                className="block w-6 h-[2px] transition-all duration-200"
+                style={{
+                  background: 'var(--teal)',
+                  transform:
+                    i === 0 ? (open ? 'translateY(7px) rotate(45deg)' : 'none')
+                    : i === 2 ? (open ? 'translateY(-7px) rotate(-45deg)' : 'none')
+                    : 'none',
+                  opacity: i === 1 && open ? 0 : 1,
+                }}
               />
             ))}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="lg:hidden bg-[#0C1616] border-t border-white/5 px-6 pb-6"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {NAV.map((link, i) => (
-              <motion.a
-                key={link.label}
-                href={link.href}
-                className="block py-3.5 text-white/70 text-xs tracking-[0.2em] uppercase border-b border-white/5 last:border-0"
-                initial={{ x: -16, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: i * 0.05 }}
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </motion.a>
-            ))}
-            <a
-              href="tel:0817313025"
-              className="mt-4 flex items-center gap-2 text-[var(--teal)] text-xs tracking-wider uppercase font-semibold"
+      {/* Mobile menu — render condizionale con animazione CSS fluida (robusta su iOS) */}
+      {open && (
+        <div className="menu-drop lg:hidden bg-[#10130F] border-t border-white/5 px-6 pb-6">
+          {NAV.map((link, i) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              prefetch={link.href === '/catalogo' ? false : undefined}
+              className="block py-3.5 text-white/70 text-xs tracking-[0.2em] uppercase border-b border-white/5 last:border-0"
+              style={{ animationDelay: `${0.05 + i * 0.04}s` }}
+              onClick={(e) => { handleAnchorClick(link.href)(e); setOpen(false) }}
             >
-              <PhoneIcon /> 081 731 3025
-            </a>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
+              {link.label}
+            </Link>
+          ))}
+          <a
+            href="tel:0817313025"
+            className="mt-4 flex items-center gap-2 text-[var(--teal)] text-xs tracking-wider uppercase font-semibold"
+          >
+            <PhoneIcon /> 081 731 3025
+          </a>
+        </div>
+      )}
+    </nav>
   )
 }
 

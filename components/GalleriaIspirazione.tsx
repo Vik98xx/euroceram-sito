@@ -1,62 +1,39 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useInView } from './motion'
-import { InteractiveImageAccordion } from './ui/interactive-image-accordion'
+import { InspirationGallery } from './ui/inspiration-gallery'
+import { AuroraBackground } from './ui/aurora-background'
 
 export default function GalleriaIspirazione() {
-  const ref = useRef<HTMLElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
-
   return (
-    <section id="ispirazione" ref={ref} className="py-24 lg:py-32" style={{ background: '#060E0E' }}>
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-20">
+    <section id="ispirazione" style={{ position: 'relative', overflow: 'hidden', background: '#080A07', paddingTop: 'var(--section-gap-sm)', paddingBottom: 'var(--section-gap-sm)' }}>
+      <AuroraBackground />
+      <div className="w-full" style={{ position: 'relative', zIndex: 1, paddingLeft: "clamp(16px, 3vw, 60px)", paddingRight: "clamp(16px, 3vw, 60px)" }}>
 
         {/* Header */}
-        <motion.div
-          className="mb-14"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
-        >
+        <div style={{ marginBottom: 'var(--header-gap)' }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-10" style={{ background: 'var(--teal)' }} />
             <span className="section-label" style={{ color: 'rgba(255,255,255,0.45)' }}>Galleria</span>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <h2 className="font-display text-white" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', lineHeight: 1.1 }}>
+          <div className="flex flex-row items-end gap-4" style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            <h2 className="font-display text-white" style={{ fontSize: 'clamp(1.6rem, 4vw, 3.2rem)', lineHeight: 1.1, flexShrink: 0 }}>
               Lasciati <span style={{ color: 'var(--teal)' }}>Ispirare</span>
             </h2>
-            <p className="text-sm max-w-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Passa il cursore su ogni pannello per scoprire le nostre categorie di prodotto
+            <p className="text-[10px] sm:text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
+              Clicca una foto per ingrandirla
             </p>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Accordion */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <InteractiveImageAccordion />
-        </motion.div>
+        {/* Galleria */}
+        <InspirationGallery />
 
         {/* CTA */}
-        <motion.div
-          className="text-center mt-12"
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.7 }}
-        >
-          <a
-            href="#preventivo"
-            className="btn-outline"
-            style={{ color: 'rgba(255,255,255,0.7)', borderColor: 'rgba(255,255,255,0.15)' }}
-          >
+        <div className="text-center" style={{ marginTop: '2rem' }}>
+          <a href="#preventivo" className="btn-primary">
             Richiedi il tuo Progetto
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   )
