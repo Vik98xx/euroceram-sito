@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { motion, useMotionValue, useMotionTemplate, useTransform, animate } from 'framer-motion'
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import LogoSVG from './LogoSVG'
 
 const DURATION = 2.0
@@ -11,6 +11,25 @@ export default function HeroScroll() {
   const started = React.useRef(false)
   const [playing, setPlaying] = React.useState(false) // pilota la caduta dei loghi
   const gridRef = React.useRef<HTMLDivElement>(null)
+  const videoRef = React.useRef<HTMLVideoElement>(null)
+
+  // Autoplay robusto del video: forza muted + play(), e ritenta quando il video è
+  // pronto o quando la scheda torna in primo piano (alcuni browser bloccano il primo play).
+  React.useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.muted = true
+    const tryPlay = () => { v.play().catch(() => {}) }
+    tryPlay()
+    v.addEventListener('canplay', tryPlay)
+    v.addEventListener('loadeddata', tryPlay)
+    document.addEventListener('visibilitychange', tryPlay)
+    return () => {
+      v.removeEventListener('canplay', tryPlay)
+      v.removeEventListener('loadeddata', tryPlay)
+      document.removeEventListener('visibilitychange', tryPlay)
+    }
+  }, [])
 
   // Griglia rivelata intorno al puntatore del mouse (desktop)
   React.useEffect(() => {
@@ -87,10 +106,9 @@ export default function HeroScroll() {
     }
   }, [progress])
 
-  // Video: da riquadro centrale 44% → schermo intero 100%
-  const videoSize = useTransform(progress, [0, 1], [44, 100])
-  const videoSizeStr = useMotionTemplate`${videoSize}%`
-  const borderRadius = useTransform(progress, [0, 0.85, 1], [14, 3, 0])
+  // Video: da riquadro centrale (44%) a schermo intero, animato con SCALE (GPU, niente lag)
+  // invece di width/height che ricalcolano il layout ad ogni frame.
+  const videoScale = useTransform(progress, [0, 1], [0.44, 1])
 
   // "Benvenuto!" sparisce appena parte l'animazione
   const benvenutoOpacity = useTransform(progress, [0, 0.3], [1, 0])
@@ -113,17 +131,22 @@ export default function HeroScroll() {
       />
       <div className="absolute inset-0" style={{ background: 'rgba(8,10,7,0.50)' }} />
 
-      {/* Video che si espande dal centro */}
+      {/* Video che si espande dal centro — animazione via transform scale (fluida) */}
       <motion.div
         className="absolute overflow-hidden"
         style={{
-          width: videoSizeStr, height: videoSizeStr,
-          top: '50%', left: '50%', x: '-50%', y: '-50%',
-          borderRadius, pointerEvents: 'none', zIndex: 1,
+          width: '100%', height: '100%',
+          top: 0, left: 0,
+          scale: videoScale,
+          transformOrigin: 'center center',
+          borderRadius: 0,
+          pointerEvents: 'none', zIndex: 1,
+          willChange: 'transform',
         }}
       >
         <video
-          autoPlay muted loop playsInline poster="/images/terrazza.jpg"
+          ref={videoRef}
+          autoPlay muted loop playsInline preload="auto" poster="/images/terrazza.jpg"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         >
           <source src="/videos/hero-bg.mp4" type="video/mp4" />
