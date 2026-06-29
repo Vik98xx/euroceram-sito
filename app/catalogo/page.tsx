@@ -5,36 +5,114 @@ import Footer from '../../components/Footer'
 import WhatsAppButton from '../../components/WhatsAppButton'
 import { FullCatalogGallery } from '../../components/ui/full-catalog-gallery'
 import { CATALOGO_DATA } from '../../lib/catalogo-data'
+import { CATALOGO_EXTRA } from '../../lib/catalogo-extra'
 
 export const metadata: Metadata = {
-  title: 'Catalogo Completo | Euroceram 2002 — Ambientazioni Emil Ceramica, FAP, Tipo Vietrese',
+  title: 'Catalogo Completo | Euroceram 2002 — Piastrelle, Arredo Bagno, Sanitari, Rubinetterie',
   description:
-    'Tutte le ambientazioni ufficiali dei brand trattati da Euroceram 2002: Emil Ceramica (Crystal, Forme, I-Wood, Portland Stone, Unique Infinity), FAP Ceramiche e Tipo Vietrese.',
+    'Il catalogo completo di Euroceram 2002 organizzato per categoria: Piastrelle & Gres, Ceramiche Decorative, Arredo Bagno, Rubinetterie, Sanitari, Box Doccia & Vasche. Brand: Emil Ceramica, FAP, Savoia, GB Group, Catalano, Galassia, Frisone e altri.',
 }
 
-const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+// FAP: escludiamo la prima foto (ambientazione bagno) come richiesto
+const fapPhotos = CATALOGO_DATA.fapCeramiche.filter(
+  (p) => !p.src.endsWith('/fap-ceramiche/1.jpg'),
+)
+
+type Photo = { src: string; title: string; pdfHref?: string; aspect?: number; pages?: readonly string[] }
+type SubGroup = { name: string; photos: readonly Photo[] }
+type Section = { id: string; label: string; sub?: string; photos?: readonly Photo[]; groups?: readonly SubGroup[] }
+
+// Sanitari organizzati per TIPO (non per brand)
+const operaLavabi = CATALOGO_EXTRA.opera.filter((p) => /colors|lavabi-arredo|zero/.test(p.src))
+const operaPiatti = CATALOGO_EXTRA.opera.filter((p) => /piatti/.test(p.src))
+
+// Foto spostate da "Lavabi d'Arredo" a "WC e Bidet" (posizioni 2, 4, 13, 18)
+const wcMovedSrcs = new Set([
+  '/images/vendor-photos/catalano/alvea-02.webp',
+  '/images/vendor-photos/catalano/alvea-04.webp',
+  '/images/vendor-photos/galassia/core.jpg',
+  '/images/vendor-photos/galassia/slide-13.jpg',
+])
+
+const lavabiSource = [...CATALOGO_EXTRA.catalano, ...operaLavabi, ...CATALOGO_EXTRA.galassia]
+
+const sanitariLavabiArredo: readonly Photo[] = lavabiSource
+  .filter((p) => !wcMovedSrcs.has(p.src))
+  .map((p, i) => ({ src: p.src, title: `Lavabo d'arredo — ${i + 1}` }))
+
+const sanitariWcBidet: readonly Photo[] = [
+  ...CATALOGO_EXTRA.wcBidetAmbient,
+  ...CATALOGO_EXTRA.karag,
+  ...lavabiSource.filter((p) => wcMovedSrcs.has(p.src)),
+].map((p, i) => ({ src: p.src, title: `WC e Bidet — ${i + 1}` }))
+
+// Piatti doccia: Thermodesign + i 2 piatti doccia di Opera (spostati qui dai Sanitari)
+const piattiDoccia: readonly Photo[] = [
+  ...CATALOGO_DATA.piattoDoccia,
+  ...operaPiatti.map((p) => ({ src: p.src, title: `Piatto doccia — Opera ${p.title.replace('Opera Sanitari — ', '')}` })),
+]
 
 export default function CatalogoPage() {
-  const sections = [
-    ...CATALOGO_DATA.emilCeramica.map((c) => ({
-      id: slug('emil-' + c.name),
-      label: c.name,
-      sub: 'Emil Ceramica',
-      photos: c.photos,
-    })),
-    { id: 'fap-ceramiche', label: 'FAP Ceramiche', sub: 'Lavorazione artigianale e ambientazioni', photos: CATALOGO_DATA.fapCeramiche },
-    { id: 'tipo-vietrese', label: 'Tipo Vietrese', sub: 'Riggiola amalfitana e sorrentina', photos: CATALOGO_DATA.tipoVietrese },
-    { id: 'rubinetterie', label: 'Rubinetterie', sub: 'Frisone Rubinetterie', photos: CATALOGO_DATA.rubinetterie },
-    ...CATALOGO_DATA.boxDoccia.map((c) => ({
-      id: slug('box-doccia-' + c.name),
-      label: c.name,
-      sub: 'Box Doccia',
-      photos: c.photos,
-    })),
-    { id: 'piatto-doccia', label: 'Piatto Doccia', sub: 'Thermodesign', photos: CATALOGO_DATA.piattoDoccia },
+  const sections: Section[] = [
+    {
+      id: 'piastrelle-gres',
+      label: 'Piastrelle & Gres',
+      sub: 'Gres porcellanato, grande formato, effetto marmo, pietra e legno',
+      groups: [
+        ...CATALOGO_DATA.emilCeramica.map((c) => ({ name: `Emil Ceramica — ${c.name}`, photos: c.photos })),
+        { name: 'FAP Ceramiche', photos: fapPhotos },
+      ],
+    },
+    {
+      id: 'ceramiche-decorative',
+      label: 'Ceramiche Decorative',
+      sub: 'Maioliche, decori artistici e riggiole della tradizione',
+      groups: [
+        { name: 'Tipo Vietrese', photos: CATALOGO_DATA.tipoVietrese },
+        { name: 'Ceramiche Savoia', photos: CATALOGO_EXTRA.savoia },
+      ],
+    },
+    {
+      id: 'arredo-bagno',
+      label: 'Arredo Bagno',
+      sub: 'Mobili bagno, lavabi e specchi — GB Group',
+      groups: [
+        { name: 'GB Group — Silk', photos: CATALOGO_EXTRA.gbgroupSilk },
+        { name: 'GB Group — Extreme', photos: CATALOGO_EXTRA.gbgroupExtreme },
+        { name: 'GB Group — Moon', photos: CATALOGO_EXTRA.gbgroupMoon },
+        { name: 'GB Group — Onda', photos: CATALOGO_EXTRA.gbgroupOnda },
+        { name: 'GB Group — Compact', photos: CATALOGO_EXTRA.gbgroupCompact },
+        { name: 'GB Group — Underground', photos: CATALOGO_EXTRA.gbgroupUnderground },
+      ],
+    },
+    {
+      id: 'rubinetterie',
+      label: 'Rubinetterie',
+      sub: 'Frisone Rubinetterie',
+      photos: CATALOGO_DATA.rubinetterie,
+    },
+    {
+      id: 'sanitari',
+      label: 'Sanitari',
+      sub: 'Lavabi d’arredo, WC, bidet e piatti doccia',
+      groups: [
+        { name: 'Lavabi d’Arredo', photos: sanitariLavabiArredo },
+        { name: 'WC e Bidet', photos: sanitariWcBidet },
+      ],
+    },
+    {
+      id: 'box-doccia-vasche',
+      label: 'Box Doccia & Vasche',
+      sub: 'Box doccia, piatti doccia e vasche',
+      groups: [
+        ...CATALOGO_DATA.boxDoccia.map((c) => ({ name: c.name, photos: c.photos })),
+        { name: 'Piatti Doccia', photos: piattiDoccia },
+      ],
+    },
   ]
 
-  const totalPhotos = sections.reduce((n, s) => n + s.photos.length, 0)
+  const countOf = (s: Section) => (s.groups ? s.groups.reduce((n, g) => n + g.photos.length, 0) : (s.photos?.length ?? 0))
+  const totalPhotos = sections.reduce((n, s) => n + countOf(s), 0)
 
   return (
     <>
@@ -50,11 +128,11 @@ export default function CatalogoPage() {
               <div className="h-px w-10" style={{ background: 'var(--teal)' }} />
             </div>
             <h1 className="font-display text-white" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.8rem)', lineHeight: 1.1 }}>
-              Tutte le Ambientazioni <span style={{ color: 'var(--teal)' }}>Ufficiali</span>
+              Il Nostro <span style={{ color: 'var(--teal)' }}>Catalogo</span>
             </h1>
             <p className="text-sm mt-4" style={{ color: 'rgba(255,255,255,0.55)', maxWidth: '38rem', marginLeft: 'auto', marginRight: 'auto' }}>
-              {totalPhotos} foto ufficiali dei brand trattati da Euroceram 2002 — Emil Ceramica, FAP Ceramiche, Tipo Vietrese,
-              Frisone Rubinetterie, Weiss-Stern, Hafro e Thermodesign. Clicca una foto per ingrandirla.
+              {totalPhotos} foto organizzate per categoria. Clicca una foto per ingrandirla e richiedere
+              maggiori informazioni sul prodotto direttamente al nostro showroom.
             </p>
             <Link
               href="/#prodotti"
@@ -92,7 +170,7 @@ export default function CatalogoPage() {
                   transition: 'background 0.25s, border-color 0.25s',
                 }}
               >
-                {s.label} <span style={{ color: 'var(--teal)', marginLeft: 4 }}>· {s.photos.length}</span>
+                {s.label} <span style={{ color: 'var(--teal)', marginLeft: 4 }}>· {countOf(s)}</span>
               </a>
             ))}
           </nav>

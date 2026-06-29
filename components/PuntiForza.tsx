@@ -8,7 +8,7 @@ type IconFC = () => React.JSX.Element
 
 const PUNTI: { n: string; title: string; desc: string; Icon: IconFC; img: string }[] = [
   { n: '01', title: 'Progettazione 3D Gratuita', desc: 'Visualizza il tuo spazio prima di acquistare con il nostro servizio di rendering 3D offerto senza costi aggiuntivi.', Icon: IconCube, img: '/images/progettazione.jpg' },
-  { n: '02', title: 'Dal 1956', desc: 'Quasi 70 anni di esperienza nel settore. Una tradizione di qualità e affidabilità tramandata di generazione in generazione.', Icon: IconTime, img: '/images/img-pavimenti-store.jpg' },
+  { n: '02', title: 'Oltre Settant\'anni di Esperienza nel Settore', desc: 'Una tradizione di qualità e affidabilità tramandata di generazione in generazione.', Icon: IconTime, img: '/images/img-pavimenti-store.jpg' },
   { n: '03', title: 'Gres Lavorato su Misura', desc: 'Taglio, squadratura e lavorazione speciale del gres porcellanato per adattarsi perfettamente al tuo progetto.', Icon: IconCut, img: '/images/lavorazionegres.jpg' },
   { n: '04', title: 'Spedizione in Tutta Italia', desc: 'Consegniamo i tuoi prodotti direttamente in cantiere o a domicilio, con imballaggio sicuro in tutta Italia.', Icon: IconShip, img: '/images/spedizioneitalia.png' },
   { n: '05', title: 'Assistenza Post-Vendita', desc: 'Il nostro supporto non finisce con l\'acquisto. Siamo sempre disponibili per consulenze tecniche e assistenza.', Icon: IconSupport, img: '/images/assistenzapostvendita.png' },

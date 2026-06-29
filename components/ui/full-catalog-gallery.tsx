@@ -1,17 +1,92 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { motion, AnimatePresence, useInView } from '../motion'
+import { motion, AnimatePresence } from '../motion'
 import { useRef } from 'react'
 
 type Photo = { src: string; title: string; pdfHref?: string; aspect?: number; pages?: readonly string[] }
-type Section = { id: string; label: string; sub?: string; photos: readonly Photo[] }
+type SubGroup = { name: string; photos: readonly Photo[] }
+type Section = { id: string; label: string; sub?: string; photos?: readonly Photo[]; groups?: readonly SubGroup[] }
+
+// Chiave Web3Forms — invio automatico delle richieste info prodotto a euroceram2002@hotmail.it
+const WEB3FORMS_KEY = 'b987d673-b06d-4654-9529-0ed7000d431c'
+
+// Tutte le foto di una sezione (piatte o raggruppate in sottocategorie)
+const sectionPhotos = (s: Section): readonly Photo[] =>
+  s.groups ? s.groups.flatMap((g) => g.photos) : (s.photos ?? [])
+
+/* Pulsante che invia ad Euroceram una richiesta di informazioni sul prodotto mostrato */
+function InfoRequestButton({ productTitle, sectionLabel }: { productTitle: string; sectionLabel: string }) {
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  // Reset quando cambia prodotto
+  useEffect(() => { setState('idle') }, [productTitle])
+
+  const send = async () => {
+    setState('sending')
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: `Richiesta info prodotto — ${productTitle}`,
+          from_name: 'Sito Euroceram 2002',
+          Messaggio: `Un visitatore del sito chiede maggiori informazioni sul prodotto qui sotto.`,
+          Categoria: sectionLabel,
+          Prodotto: productTitle,
+        }),
+      })
+      setState(res.ok ? 'sent' : 'error')
+    } catch {
+      setState('error')
+    }
+  }
+
+  if (state === 'sent') {
+    return (
+      <div
+        className="inline-flex items-center gap-2"
+        style={{ marginTop: '0.85rem', color: 'var(--teal)', fontSize: '0.82rem', fontWeight: 600 }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        Richiesta inviata! Ti contatteremo presto.
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); send() }}
+      disabled={state === 'sending'}
+      className="inline-flex items-center gap-2"
+      style={{
+        marginTop: '0.85rem',
+        padding: '10px 20px',
+        borderRadius: 999,
+        background: state === 'error' ? 'rgba(200,80,80,0.18)' : 'rgba(111,168,144,0.18)',
+        border: '1px solid rgba(111,168,144,0.5)',
+        color: state === 'error' ? '#ffb4b4' : 'var(--teal)',
+        fontSize: '0.8rem',
+        fontWeight: 600,
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        cursor: state === 'sending' ? 'wait' : 'pointer',
+        backdropFilter: 'blur(8px)',
+      }}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
+      {state === 'sending' ? 'Invio…' : state === 'error' ? 'Riprova' : 'Chiedi maggiori info sul prodotto'}
+    </button>
+  )
+}
 
 export function FullCatalogGallery({ sections }: { sections: readonly Section[] }) {
   // Flatten for global lightbox prev/next navigation
   const flat = useMemo(() => {
     const out: { photo: Photo; sectionLabel: string }[] = []
-    for (const s of sections) for (const p of s.photos) out.push({ photo: p, sectionLabel: s.label })
+    for (const s of sections) for (const p of sectionPhotos(s)) out.push({ photo: p, sectionLabel: s.label })
     return out
   }, [sections])
 
@@ -58,12 +133,12 @@ export function FullCatalogGallery({ sections }: { sections: readonly Section[] 
     return () => window.removeEventListener('keydown', onKey)
   }, [zoomPage])
 
-  // Map each (section, localIndex) to a global flat index for the lightbox
+  // Map each section to a global flat offset for the lightbox
   let runningOffset = 0
   const offsets: number[] = []
   for (const s of sections) {
     offsets.push(runningOffset)
-    runningOffset += s.photos.length
+    runningOffset += sectionPhotos(s).length
   }
 
   return (
@@ -251,7 +326,7 @@ export function FullCatalogGallery({ sections }: { sections: readonly Section[] 
               <img
                 src={flat[lightbox].photo.src}
                 alt={flat[lightbox].photo.title}
-                style={{ maxWidth: '100%', maxHeight: '78vh', borderRadius: 8, boxShadow: '0 30px 90px rgba(0,0,0,0.7)', objectFit: 'contain' }}
+                style={{ maxWidth: '100%', maxHeight: '68vh', borderRadius: 8, boxShadow: '0 30px 90px rgba(0,0,0,0.7)', objectFit: 'contain' }}
               />
               <div className="text-center" style={{ maxWidth: '90vw' }}>
                 <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ color: 'var(--teal)' }}>
@@ -262,6 +337,13 @@ export function FullCatalogGallery({ sections }: { sections: readonly Section[] 
                 </div>
                 <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   {lightbox + 1} / {flat.length}
+                </div>
+                {/* Richiesta info prodotto — invio automatico a Euroceram */}
+                <div>
+                  <InfoRequestButton
+                    productTitle={flat[lightbox].photo.title}
+                    sectionLabel={flat[lightbox].sectionLabel}
+                  />
                 </div>
                 {flat[lightbox].photo.pdfHref && (
                   <a
@@ -310,6 +392,129 @@ export function FullCatalogGallery({ sections }: { sections: readonly Section[] 
   )
 }
 
+/* Griglia di foto di una (sotto)categoria. baseOffset = indice globale della prima foto. */
+function PhotoGrid({
+  photos,
+  baseOffset,
+  onOpen,
+  onOpenPdf,
+}: {
+  photos: readonly Photo[]
+  baseOffset: number
+  onOpen: (i: number) => void
+  onOpenPdf: (p: Photo) => void
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+        gap: '0.85rem',
+      }}
+    >
+      {photos.map((p, i) => {
+        const isPdf = !!p.pdfHref
+        return (
+          <button
+            key={p.src}
+            type="button"
+            onClick={() => {
+              if (isPdf) onOpenPdf(p)
+              else onOpen(baseOffset + i)
+            }}
+            className="relative overflow-hidden group catalog-thumb"
+            style={{
+              aspectRatio: isPdf ? (p.aspect ?? 0.75) : 4 / 3,
+              borderRadius: 10,
+              border: isPdf ? '1px solid rgba(111,168,144,0.4)' : '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer',
+              padding: 0,
+            }}
+          >
+            <img
+              src={p.src}
+              alt={p.title}
+              className="w-full h-full object-cover catalog-thumb-img"
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100"
+              style={{ background: 'linear-gradient(to top, rgba(8,10,7,0.7), transparent 55%)', transition: 'opacity 0.3s' }}
+            />
+            {isPdf && (
+              <span
+                className="absolute top-2 right-2 text-[9px] font-bold tracking-wider uppercase"
+                style={{ color: '#fff', background: 'rgba(111,168,144,0.85)', padding: '3px 8px', borderRadius: 999 }}
+              >
+                PDF
+              </span>
+            )}
+            <span
+              className="absolute bottom-2 left-2 right-2 text-[10px] opacity-0 group-hover:opacity-100"
+              style={{ color: 'rgba(255,255,255,0.85)', transition: 'opacity 0.3s', lineHeight: 1.3 }}
+            >
+              {isPdf ? `${p.title} — visualizza` : p.title}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+/* Sottocategoria con titolo cliccabile per aprire/chiudere (come le categorie) */
+function SubGroupBlock({
+  group,
+  baseOffset,
+  onOpen,
+  onOpenPdf,
+}: {
+  group: SubGroup
+  baseOffset: number
+  onOpen: (i: number) => void
+  onOpenPdf: (p: Photo) => void
+}) {
+  const [collapsed, setCollapsed] = useState(false)
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setCollapsed((c) => !c)}
+        className="flex items-center gap-2.5 w-full text-left"
+        style={{ marginBottom: '1rem', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
+        <span className="text-[11px] tracking-[0.18em] uppercase font-semibold" style={{ color: 'var(--teal)' }}>
+          {group.name}
+        </span>
+        <div className="h-px flex-1" style={{ background: 'rgba(111,168,144,0.18)' }} />
+        <span className="text-[10px] flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          {group.photos.length}
+          <svg
+            width="12" height="12" viewBox="0 0 14 14" fill="none"
+            style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.25s' }}
+          >
+            <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </button>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: collapsed ? '0fr' : '1fr',
+          transition: 'grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
+        }}
+      >
+        <div style={{ overflow: 'hidden', minHeight: 0 }}>
+          <div style={{ opacity: collapsed ? 0 : 1, transition: 'opacity 0.22s ease' }}>
+            <PhotoGrid photos={group.photos} baseOffset={baseOffset} onOpen={onOpen} onOpenPdf={onOpenPdf} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function GallerySection({
   section,
   offset,
@@ -322,8 +527,16 @@ function GallerySection({
   onOpenPdf: (p: Photo) => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
   const [collapsed, setCollapsed] = useState(false)
+  const total = sectionPhotos(section).length
+
+  // Indice globale di partenza di ogni sottocategoria
+  let acc = offset
+  const groupOffsets = (section.groups ?? []).map((g) => {
+    const start = acc
+    acc += g.photos.length
+    return start
+  })
 
   return (
     <div id={section.id} ref={ref} style={{ marginBottom: '4.5rem' }}>
@@ -332,8 +545,8 @@ function GallerySection({
         className="flex items-center gap-3 w-full text-left"
         style={{ marginBottom: '1.75rem', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
         initial={{ opacity: 0, y: 16 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="h-px w-10" style={{ background: 'var(--teal)' }} />
         <div>
@@ -345,7 +558,7 @@ function GallerySection({
           )}
         </div>
         <span className="text-xs ml-auto flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-          {section.photos.length} foto
+          {total} foto
           <svg
             width="14" height="14" viewBox="0 0 14 14" fill="none"
             style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.25s' }}
@@ -355,7 +568,7 @@ function GallerySection({
         </span>
       </motion.button>
 
-      {/* Tendina CSS-only: grid-template-rows anima lo spazio in modo sincrono, senza ricalcoli JS per foto */}
+      {/* Tendina CSS-only: grid-template-rows anima lo spazio in modo sincrono */}
       <div
         style={{
           display: 'grid',
@@ -364,67 +577,14 @@ function GallerySection({
         }}
       >
         <div style={{ overflow: 'hidden', minHeight: 0 }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-              gap: '0.85rem',
-              opacity: collapsed ? 0 : 1,
-              transition: 'opacity 0.22s ease',
-            }}
-          >
-          {section.photos.map((p, i) => {
-            const isPdf = !!p.pdfHref
-            return (
-              <motion.button
-                key={p.src}
-                onClick={() => {
-                  if (isPdf) onOpenPdf(p)
-                  else onOpen(offset + i)
-                }}
-                className="relative overflow-hidden group"
-                style={{
-                  aspectRatio: isPdf ? (p.aspect ?? 0.75) : 4 / 3,
-                  borderRadius: 10,
-                  border: isPdf ? '1px solid rgba(111,168,144,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                  cursor: 'pointer',
-                  padding: 0,
-                }}
-                initial={{ opacity: 0, y: 18 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, delay: Math.min(i * 0.02, 0.4), ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -3 }}
-              >
-                <img
-                  src={p.src}
-                  alt={p.title}
-                  className="w-full h-full object-cover"
-                  style={{ transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1)' }}
-                  loading="lazy"
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100"
-                  style={{ background: 'linear-gradient(to top, rgba(8,10,7,0.7), transparent 55%)', transition: 'opacity 0.3s' }}
-                />
-                {isPdf && (
-                  <span
-                    className="absolute top-2 right-2 text-[9px] font-bold tracking-wider uppercase"
-                    style={{ color: '#fff', background: 'rgba(111,168,144,0.85)', padding: '3px 8px', borderRadius: 999 }}
-                  >
-                    PDF
-                  </span>
-                )}
-                <span
-                  className="absolute bottom-2 left-2 right-2 text-[10px] opacity-0 group-hover:opacity-100"
-                  style={{ color: 'rgba(255,255,255,0.85)', transition: 'opacity 0.3s', lineHeight: 1.3 }}
-                >
-                  {isPdf ? `${p.title} — visualizza` : p.title}
-                </span>
-              </motion.button>
-            )
-          })}
+          <div style={{ opacity: collapsed ? 0 : 1, transition: 'opacity 0.22s ease', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {section.groups ? (
+              section.groups.map((g, gi) => (
+                <SubGroupBlock key={g.name} group={g} baseOffset={groupOffsets[gi]} onOpen={onOpen} onOpenPdf={onOpenPdf} />
+              ))
+            ) : (
+              <PhotoGrid photos={section.photos ?? []} baseOffset={offset} onOpen={onOpen} onOpenPdf={onOpenPdf} />
+            )}
           </div>
         </div>
       </div>

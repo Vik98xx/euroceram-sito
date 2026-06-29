@@ -296,3 +296,11 @@ select:focus-visible,
   left: 12px;
   top: 12px;
 }
+
+/* Miniature catalogo — hover leggero in CSS puro (niente Framer Motion per migliaia di foto) */
+/* content-visibility: il browser salta rendering/decodifica delle miniature fuori schermo,
+   eliminando il lag quando una categoria ha centinaia di foto (es. Piastrelle & Gres). */
+.catalog-thumb { transition: transform 0.25s cubic-bezier(0.22,1,0.36,1); content-visibility: auto; contain-intrinsic-size: 220px 165px; }
+.catalog-thumb:hover { transform: translateY(-3px); }
+.catalog-thumb-img { transition: transform 0.6s cubic-bezier(0.22,1,0.36,1); }
+.catalog-thumb:hover .catalog-thumb-img { transform: scale(1.06); }

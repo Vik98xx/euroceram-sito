@@ -13,7 +13,7 @@ const CATEGORIES = [
     accent: 'var(--teal)',
     icon: <TileIcon />,
     img: '/images/vendor-photos/emil-ceramica/crystal--tdm20extra20120x27820living.jpg',
-    catalogAnchor: 'emil-crystal',
+    catalogAnchor: 'piastrelle-gres',
   },
   {
     title: 'Ceramiche Decorative',
@@ -22,7 +22,7 @@ const CATEGORIES = [
     accent: 'var(--accent)',
     icon: <WallIcon />,
     img: '/images/vendor-photos/emil-ceramica/forme-ambienti-jpeg-300dpi-a4--forme-antracite-80x80-majolica-lux-ocra-brick-bianco-assoluto-antracite-amb-ristorante.jpg',
-    catalogAnchor: 'emil-forme',
+    catalogAnchor: 'ceramiche-decorative',
   },
   {
     title: 'Arredo Bagno',
@@ -31,7 +31,7 @@ const CATEGORIES = [
     accent: 'var(--teal)',
     icon: <BathroomIcon />,
     img: '/images/brand-photos/bagno-1.jpg',
-    catalogAnchor: 'fap-ceramiche',
+    catalogAnchor: 'arredo-bagno',
   },
   {
     title: 'Rubinetterie',
@@ -40,7 +40,7 @@ const CATEGORIES = [
     accent: 'var(--accent)',
     icon: <TapIcon />,
     img: '/images/brand-photos/rubinetteria-cover.png',
-    catalogAnchor: null,
+    catalogAnchor: 'rubinetterie',
   },
   {
     title: 'Sanitari',
@@ -49,7 +49,7 @@ const CATEGORIES = [
     accent: 'var(--teal)',
     icon: <SanitaryIcon />,
     img: '/images/brand-photos/sanitari-4.webp',
-    catalogAnchor: null,
+    catalogAnchor: 'sanitari',
   },
   {
     title: 'Box Doccia & Vasche',
@@ -58,16 +58,7 @@ const CATEGORIES = [
     accent: 'var(--accent)',
     icon: <ShowerIcon />,
     img: '/images/brand-photos/docce-2.jpg',
-    catalogAnchor: null,
-  },
-  {
-    title: 'Tipo Vietrese',
-    desc: 'La riggiola tipica delle zone amalfitane e sorrentine: ceramica tradizionale che fonde passato e presente in rosoni e decori dai colori del mare.',
-    tags: ['Riggiola', 'Maiolica del Golfo', 'Cotto Mediterraneo', 'Fatto a Mano'],
-    accent: 'var(--accent)',
-    icon: <RiggiolaIcon />,
-    img: '/images/vendor-photos/tipo-vietrese/pdf-antiche-riggiole-napoletane-p1.jpg',
-    catalogAnchor: 'tipo-vietrese',
+    catalogAnchor: 'box-doccia-vasche',
   },
 ]
 
