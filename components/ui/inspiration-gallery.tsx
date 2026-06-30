@@ -40,7 +40,8 @@ function MarqueeRow({
               alt={p.title}
               className="w-full h-full object-cover"
               style={{ transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1)' }}
-              loading="lazy"
+              loading="eager"
+              decoding="async"
               onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             />
