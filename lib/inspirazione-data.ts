@@ -34,7 +34,7 @@ export const INSPIRAZIONE_PHOTOS: InspoPhoto[] = [
   // Outdoor & Piscine
   { src: '/images/img-outdoor-piscina.jpg', title: 'Outdoor & Piscine', cat: 'Outdoor & Piscine' },
   { src: '/images/img-terrazza-piscina.jpg', title: 'Terrazza Piscina', cat: 'Outdoor & Piscine' },
-  { src: '/images/hero-outdoor.jpg', title: 'Living Esterno', cat: 'Outdoor & Piscine' },
+  { src: '/images/img-outdoor-piscina.jpg', title: 'Living Esterno', cat: 'Outdoor & Piscine' },
 
   // Contract / Luxury
   { src: '/images/img-tagina-luxury.jpg', title: 'Luxury Store', cat: 'Contract' },
