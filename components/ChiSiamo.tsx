@@ -80,10 +80,16 @@ export default function ChiSiamo() {
             </div>
 
             <div
-              className="flex flex-wrap justify-center gap-3"
+              className="flex"
               style={{ marginTop: '3rem' }}
             >
-              <a href="#prodotti" className="btn-primary">Esplora i Prodotti</a>
+              <a
+                href="#prodotti"
+                className="btn-primary"
+                style={{ padding: '20px 64px', fontSize: '1rem', letterSpacing: '0.12em' }}
+              >
+                Esplora i Prodotti
+              </a>
             </div>
           </div>
 
