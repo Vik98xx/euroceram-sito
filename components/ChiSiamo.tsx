@@ -80,10 +80,9 @@ export default function ChiSiamo() {
             </div>
 
             <div
-              className="flex flex-wrap gap-3"
+              className="flex flex-wrap justify-center gap-3"
               style={{ marginTop: '3rem' }}
             >
-              <a href="#preventivo" className="btn-primary">Richiedi Preventivo</a>
               <a href="#prodotti" className="btn-primary">Esplora i Prodotti</a>
             </div>
           </div>
