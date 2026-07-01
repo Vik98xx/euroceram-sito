@@ -2,6 +2,7 @@
 
 import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from '../motion'
 import { useRef } from 'react'
 
@@ -69,9 +70,19 @@ function InfoRequestButton({ productTitle, sectionLabel }: { productTitle: strin
     )
   }
 
-  // Pulsante iniziale
-  if (state === 'idle') {
-    return (
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '11px 14px', marginTop: 10, borderRadius: 10,
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(111,168,144,0.35)',
+    color: '#fff', fontSize: '0.95rem', outline: 'none',
+    WebkitTextFillColor: '#fff', boxSizing: 'border-box',
+  }
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation()
+  const closeForm = () => { if (state !== 'sending') setState('idle') }
+  const showModal = state === 'form' || state === 'sending' || state === 'error'
+
+  return (
+    <>
+      {/* Pulsante che apre il modale centrato */}
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); setState('form') }}
@@ -86,53 +97,77 @@ function InfoRequestButton({ productTitle, sectionLabel }: { productTitle: strin
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
         Chiedi maggiori info sul prodotto
       </button>
-    )
-  }
 
-  // Mini-form recapiti
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '9px 12px', marginTop: 8, borderRadius: 8,
-    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(111,168,144,0.35)',
-    color: '#fff', fontSize: '0.85rem', outline: 'none',
-    WebkitTextFillColor: '#fff',
-  }
-  const stop = (e: React.SyntheticEvent) => e.stopPropagation()
+      {/* Modale centrato SOPRA la foto (portale su document.body per restare al centro schermo) */}
+      {showModal && typeof document !== 'undefined' && createPortal(
+        <div
+          onClick={closeForm}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 'clamp(16px, 4vw, 40px)',
+            background: 'rgba(4,10,10,0.72)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <div
+            onClick={stop}
+            style={{
+              position: 'relative', width: 'min(420px, 100%)', maxHeight: '90vh', overflowY: 'auto',
+              textAlign: 'left', padding: 'clamp(18px, 4vw, 26px)', borderRadius: 18,
+              background: 'rgba(16,19,15,0.98)', border: '1px solid rgba(111,168,144,0.4)',
+              boxShadow: '0 30px 90px rgba(0,0,0,0.7), inset 1px 1px 0 rgba(255,255,255,0.06)',
+            }}
+          >
+            {/* Chiudi */}
+            <button
+              type="button" onClick={(e) => { e.stopPropagation(); closeForm() }} aria-label="Chiudi"
+              style={{
+                position: 'absolute', top: 12, right: 12, width: 34, height: 34, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.16)',
+                color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 18 18" fill="none"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+            </button>
 
-  return (
-    <div
-      onClick={stop}
-      style={{
-        marginTop: '0.85rem', width: 'min(340px, 86vw)', textAlign: 'left',
-        padding: '14px', borderRadius: 12, background: 'rgba(16,19,15,0.9)',
-        border: '1px solid rgba(111,168,144,0.35)', backdropFilter: 'blur(10px)',
-      }}
-    >
-      <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>
-        Lascia i tuoi recapiti: <b style={{ color: 'var(--teal)' }}>ti ricontatteremo noi</b> con le informazioni su questo prodotto.
-      </div>
-      <input value={nome} onChange={(e) => setNome(e.target.value)} onClick={stop} placeholder="Nome e cognome *" style={inputStyle} />
-      <input value={telefono} onChange={(e) => setTelefono(e.target.value)} onClick={stop} type="tel" placeholder="Telefono" style={inputStyle} />
-      <input value={email} onChange={(e) => setEmail(e.target.value)} onClick={stop} type="email" placeholder="Email" style={inputStyle} />
-      <textarea value={messaggio} onChange={(e) => setMessaggio(e.target.value)} onClick={stop} rows={2} placeholder="Messaggio (facoltativo)" style={{ ...inputStyle, resize: 'none' }} />
-      <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)', marginTop: 6 }}>
-        Indica almeno un recapito (telefono o email).
-      </div>
-      <button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); send() }}
-        disabled={!canSend || state === 'sending'}
-        style={{
-          width: '100%', marginTop: 10, padding: '11px', borderRadius: 999,
-          background: canSend ? 'rgba(111,168,144,0.9)' : 'rgba(111,168,144,0.25)',
-          border: '1px solid rgba(111,168,144,0.6)',
-          color: canSend ? '#0d130f' : 'rgba(255,255,255,0.5)',
-          fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
-          cursor: canSend && state !== 'sending' ? 'pointer' : 'not-allowed',
-        }}
-      >
-        {state === 'sending' ? 'Invio…' : state === 'error' ? 'Errore, riprova' : 'Invia richiesta'}
-      </button>
-    </div>
+            <div className="text-[10px] tracking-[0.3em] uppercase font-bold" style={{ color: 'var(--teal)', marginBottom: 4 }}>
+              Richiesta informazioni
+            </div>
+            <div className="font-display text-white" style={{ fontSize: '1.15rem', lineHeight: 1.2, marginBottom: 4, paddingRight: 30 }}>
+              {productTitle}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.72)', marginBottom: 4 }}>
+              Lascia i tuoi recapiti: <b style={{ color: 'var(--teal)' }}>ti ricontatteremo noi</b> con le informazioni su questo prodotto.
+            </div>
+
+            <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome e cognome *" style={inputStyle} />
+            <input value={telefono} onChange={(e) => setTelefono(e.target.value)} type="tel" placeholder="Telefono" style={inputStyle} />
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" style={inputStyle} />
+            <textarea value={messaggio} onChange={(e) => setMessaggio(e.target.value)} rows={3} placeholder="Messaggio (facoltativo)" style={{ ...inputStyle, resize: 'none' }} />
+            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)', marginTop: 8 }}>
+              Indica almeno un recapito (telefono o email).
+            </div>
+
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); send() }}
+              disabled={!canSend || state === 'sending'}
+              style={{
+                width: '100%', marginTop: 14, padding: '13px', borderRadius: 999,
+                background: canSend ? 'rgba(111,168,144,0.9)' : 'rgba(111,168,144,0.25)',
+                border: '1px solid rgba(111,168,144,0.6)',
+                color: canSend ? '#0d130f' : 'rgba(255,255,255,0.5)',
+                fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
+                cursor: canSend && state !== 'sending' ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {state === 'sending' ? 'Invio…' : state === 'error' ? 'Errore, riprova' : 'Invia richiesta'}
+            </button>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </>
   )
 }
 
