@@ -5,7 +5,7 @@ import { AuroraBackground } from './ui/aurora-background'
 
 const STATS = [
   { value: 1956, label: 'Anno di fondazione', prefix: 'Dal' },
-  { value: 68, suffix: '+', label: 'Anni di esperienza' },
+  { value: 70, suffix: '+', label: 'Anni di esperienza' },
   { value: 200, suffix: '+', label: 'Brand in catalogo' },
   { value: 1000, suffix: 'm²', label: 'Showroom ad Arzano' },
 ]
