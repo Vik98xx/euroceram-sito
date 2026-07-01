@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from '../motion'
 import { useRef } from 'react'
@@ -15,14 +16,24 @@ const WEB3FORMS_KEY = 'b987d673-b06d-4654-9529-0ed7000d431c'
 const sectionPhotos = (s: Section): readonly Photo[] =>
   s.groups ? s.groups.flatMap((g) => g.photos) : (s.photos ?? [])
 
-/* Pulsante che invia ad Euroceram una richiesta di informazioni sul prodotto mostrato */
+/* Richiesta info prodotto: al click compare un mini-form con i recapiti del cliente,
+   così Euroceram può ricontattarlo. L'invio arriva via email a euroceram2002@hotmail.it. */
 function InfoRequestButton({ productTitle, sectionLabel }: { productTitle: string; sectionLabel: string }) {
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'form' | 'sending' | 'sent' | 'error'>('idle')
+  const [nome, setNome] = useState('')
+  const [telefono, setTelefono] = useState('')
+  const [email, setEmail] = useState('')
+  const [messaggio, setMessaggio] = useState('')
 
   // Reset quando cambia prodotto
-  useEffect(() => { setState('idle') }, [productTitle])
+  useEffect(() => {
+    setState('idle'); setNome(''); setTelefono(''); setEmail(''); setMessaggio('')
+  }, [productTitle])
+
+  const canSend = nome.trim().length > 0 && (telefono.trim().length > 0 || email.trim().length > 0)
 
   const send = async () => {
+    if (!canSend) return
     setState('sending')
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
@@ -31,10 +42,13 @@ function InfoRequestButton({ productTitle, sectionLabel }: { productTitle: strin
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
           subject: `Richiesta info prodotto — ${productTitle}`,
-          from_name: 'Sito Euroceram 2002',
-          Messaggio: `Un visitatore del sito chiede maggiori informazioni sul prodotto qui sotto.`,
+          from_name: nome || 'Sito Euroceram 2002',
+          Nome: nome,
+          Telefono: telefono || '(non fornito)',
+          Email: email || '(non fornita)',
           Categoria: sectionLabel,
           Prodotto: productTitle,
+          Messaggio: messaggio || 'Il cliente chiede maggiori informazioni su questo prodotto.',
         }),
       })
       setState(res.ok ? 'sent' : 'error')
@@ -50,35 +64,75 @@ function InfoRequestButton({ productTitle, sectionLabel }: { productTitle: strin
         style={{ marginTop: '0.85rem', color: 'var(--teal)', fontSize: '0.82rem', fontWeight: 600 }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        Richiesta inviata! Ti contatteremo presto.
+        Richiesta inviata! Ti ricontatteremo presto.
       </div>
     )
   }
 
+  // Pulsante iniziale
+  if (state === 'idle') {
+    return (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); setState('form') }}
+        className="inline-flex items-center gap-2"
+        style={{
+          marginTop: '0.85rem', padding: '10px 20px', borderRadius: 999,
+          background: 'rgba(111,168,144,0.18)', border: '1px solid rgba(111,168,144,0.5)',
+          color: 'var(--teal)', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em',
+          textTransform: 'uppercase', cursor: 'pointer', backdropFilter: 'blur(8px)',
+        }}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
+        Chiedi maggiori info sul prodotto
+      </button>
+    )
+  }
+
+  // Mini-form recapiti
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '9px 12px', marginTop: 8, borderRadius: 8,
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(111,168,144,0.35)',
+    color: '#fff', fontSize: '0.85rem', outline: 'none',
+    WebkitTextFillColor: '#fff',
+  }
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation()
+
   return (
-    <button
-      type="button"
-      onClick={(e) => { e.stopPropagation(); send() }}
-      disabled={state === 'sending'}
-      className="inline-flex items-center gap-2"
+    <div
+      onClick={stop}
       style={{
-        marginTop: '0.85rem',
-        padding: '10px 20px',
-        borderRadius: 999,
-        background: state === 'error' ? 'rgba(200,80,80,0.18)' : 'rgba(111,168,144,0.18)',
-        border: '1px solid rgba(111,168,144,0.5)',
-        color: state === 'error' ? '#ffb4b4' : 'var(--teal)',
-        fontSize: '0.8rem',
-        fontWeight: 600,
-        letterSpacing: '0.04em',
-        textTransform: 'uppercase',
-        cursor: state === 'sending' ? 'wait' : 'pointer',
-        backdropFilter: 'blur(8px)',
+        marginTop: '0.85rem', width: 'min(340px, 86vw)', textAlign: 'left',
+        padding: '14px', borderRadius: 12, background: 'rgba(16,19,15,0.9)',
+        border: '1px solid rgba(111,168,144,0.35)', backdropFilter: 'blur(10px)',
       }}
     >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
-      {state === 'sending' ? 'Invio…' : state === 'error' ? 'Riprova' : 'Chiedi maggiori info sul prodotto'}
-    </button>
+      <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>
+        Lascia i tuoi recapiti: <b style={{ color: 'var(--teal)' }}>ti ricontatteremo noi</b> con le informazioni su questo prodotto.
+      </div>
+      <input value={nome} onChange={(e) => setNome(e.target.value)} onClick={stop} placeholder="Nome e cognome *" style={inputStyle} />
+      <input value={telefono} onChange={(e) => setTelefono(e.target.value)} onClick={stop} type="tel" placeholder="Telefono" style={inputStyle} />
+      <input value={email} onChange={(e) => setEmail(e.target.value)} onClick={stop} type="email" placeholder="Email" style={inputStyle} />
+      <textarea value={messaggio} onChange={(e) => setMessaggio(e.target.value)} onClick={stop} rows={2} placeholder="Messaggio (facoltativo)" style={{ ...inputStyle, resize: 'none' }} />
+      <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)', marginTop: 6 }}>
+        Indica almeno un recapito (telefono o email).
+      </div>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); send() }}
+        disabled={!canSend || state === 'sending'}
+        style={{
+          width: '100%', marginTop: 10, padding: '11px', borderRadius: 999,
+          background: canSend ? 'rgba(111,168,144,0.9)' : 'rgba(111,168,144,0.25)',
+          border: '1px solid rgba(111,168,144,0.6)',
+          color: canSend ? '#0d130f' : 'rgba(255,255,255,0.5)',
+          fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
+          cursor: canSend && state !== 'sending' ? 'pointer' : 'not-allowed',
+        }}
+      >
+        {state === 'sending' ? 'Invio…' : state === 'error' ? 'Errore, riprova' : 'Invia richiesta'}
+      </button>
+    </div>
   )
 }
 
